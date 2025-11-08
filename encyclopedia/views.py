@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, redirect
 import random
-
+import markdown2
+from django.utils.safestring import mark_safe
 from . import util
 
 
@@ -10,10 +11,12 @@ def index(request):
     })
 
 def entry(request, title):
-    Entry = util.get_entry(title)
-    if Entry is None:
+    content = util.get_entry(title)
+    if content is None:
         return HttpResponse("Requested entry was not found!")
     else:
+        html = markdown2.markdown(content)
+        Entry = mark_safe(html)
         return render(request, "encyclopedia/entry.html", {
             "title": title,
             "Entry": Entry
